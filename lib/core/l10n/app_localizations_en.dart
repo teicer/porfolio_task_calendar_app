@@ -147,6 +147,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get todays_tasks => 'Today\'s tasks';
 
   @override
+  String get scheduled_tasks => 'Scheduled tasks';
+
+  @override
+  String get overdue_tasks => 'Overdue tasks';
+
+  @override
+  String get all_tasks => 'All tasks';
+
+  @override
   String get tasks => 'Tasks';
 
   @override
@@ -220,4 +229,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get save_task => 'Save Task';
+
+  @override
+  String get this_action_irreversible => 'This action is irreversible';
+
+  @override
+  String get are_you_sure => 'Are you sure?';
+
+  @override
+  String get caution => 'Caution';
+
+  @override
+  String get info => 'Information';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get complete_tasks => 'Completed tasks';
+
+  @override
+  String get uncomplete_tasks => 'Uncompleted tasks';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get language_selection => 'Language Selection';
+
+  @override
+  String get theme_selection => 'Theme Selection';
+
+  @override
+  String get date_format_selection => 'Date Format Selection';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get logout => 'Logout';
+
+  @override
+  String get logout_successful => 'Logout successful.';
+
+  @override
+  String get are_you_sure_to_logout => 'Are you sure you want to logout?';
+
+  @override
+  String get friend => 'Friend';
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:porfolio_task_calendar_app/core/app/app_numbers.dart';
+import 'package:porfolio_task_calendar_app/core/ui/components/input_component.dart';
 import 'package:porfolio_task_calendar_app/core/utils/extension/context_extension.dart';
 
 class SubTasksComponent extends StatefulWidget {
@@ -39,18 +40,15 @@ class _SubTasksComponentState extends State<SubTasksComponent> {
           isEditing ? context.loc.edit_sub_task : context.loc.add_sub_task,
           style: TextStyle(color: ctx.color.primaryText, fontWeight: FontWeight.bold, fontSize: AppNumbers.getH3(ctx)),
         ),
-        content: TextField(
-          controller: textController,
-          autofocus: true,
-          style: TextStyle(color: ctx.color.primaryText, fontSize: AppNumbers.body(ctx)),
-          decoration: InputDecoration(
-            hintText: context.loc.enter_sub_task,
-            hintStyle: TextStyle(color: ctx.color.secondaryText.withValues(alpha: 0.7), fontSize: AppNumbers.body(ctx)),
-            filled: true,
-            fillColor: ctx.color.overBg,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppNumbers.radius),
-              borderSide: BorderSide.none,
+
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: AppNumbers.padding),
+            child: InputComponent(
+              title: context.loc.title,
+              controller: textController,
+              hint: context.loc.enter_sub_task,
             ),
           ),
         ),

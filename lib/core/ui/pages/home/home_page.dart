@@ -6,6 +6,7 @@ import 'package:porfolio_task_calendar_app/core/app/app_ui.dart';
 import 'package:porfolio_task_calendar_app/core/models/category_model.dart';
 import 'package:porfolio_task_calendar_app/core/models/task_day_model.dart';
 import 'package:porfolio_task_calendar_app/core/models/tasks_model.dart';
+import 'package:porfolio_task_calendar_app/core/models/user_model.dart';
 import 'package:porfolio_task_calendar_app/core/ui/components/calendar_strip_component.dart';
 import 'package:porfolio_task_calendar_app/core/ui/components/card_component.dart';
 import 'package:porfolio_task_calendar_app/core/ui/components/fab_component.dart';
@@ -13,6 +14,7 @@ import 'package:porfolio_task_calendar_app/core/ui/components/looder_component.d
 import 'package:porfolio_task_calendar_app/core/ui/components/page_base.dart';
 import 'package:porfolio_task_calendar_app/core/ui/components/progress_dialog.dart';
 import 'package:porfolio_task_calendar_app/core/ui/pages/home/tast_card_component.dart';
+import 'package:porfolio_task_calendar_app/core/ui/pages/task_by_status/task_by_status_page.dart';
 import 'package:porfolio_task_calendar_app/core/ui/pages/tasks/create_update_page.dart';
 import 'package:porfolio_task_calendar_app/core/ui/pages/tasks/task_view_page.dart';
 import 'package:porfolio_task_calendar_app/core/utils/app_utils.dart';
@@ -20,9 +22,9 @@ import 'package:porfolio_task_calendar_app/core/utils/extension/context_extensio
 import 'package:porfolio_task_calendar_app/core/utils/http/api_caller.dart';
 import 'package:porfolio_task_calendar_app/core/utils/http/json_parser.dart';
 import 'package:porfolio_task_calendar_app/core/utils/log/log.dart';
-import 'package:porfolio_task_calendar_app/core/utils/providers/locale_provider.dart';
+import 'package:porfolio_task_calendar_app/core/utils/providers/date_time_provider.dart';
 import 'package:porfolio_task_calendar_app/core/utils/providers/singleton_data_provider.dart';
-import 'package:porfolio_task_calendar_app/core/utils/providers/theme_provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,12 +34,10 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  //Providers
-  final ThemeProvider _themeProvider = ThemeProvider();
-  final LocaleProvider _localeProvider = LocaleProvider();
   //Flags
   bool _allowRender = false;
   bool _isLoading = false;
+
   //Data
   DateTime _searchDate = DateTime.now();
   List<TaskModel> _tasks = [];
@@ -61,68 +61,92 @@ class _HomePageState extends State<HomePage> {
     return PopScope(
       canPop: false,
       child: PageBase.home(
-        title: '${context.loc.hello} Christos',
-        leftSideWidget: AppUI.leftSideWidgetHome(context, _themeProvider, _localeProvider),
+        title: '${context.loc.hello} ${UserModel().name.isEmpty ? context.loc.friend : UserModel().name}',
+        leftSideWidget: AppUI.leftSideWidgetHome(context, () {
+          if (context.mounted) {
+            setState(() {});
+          }
+        }),
         child: _allowRender
             ? Stack(
                 children: [
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          ValueListenableBuilder<TaskCounter>(
-                            valueListenable: SingletonDataProvider().taskCounterNotifier,
-                            builder: (context, counters, _) {
-                              return _uiMainCards(
-                                context.loc.today,
-                                counters.today,
-                                context.color.todayCardBg,
-                                AppIcons.taskToday,
-                              );
-                            },
-                          ),
-                          const SizedBox(width: AppNumbers.space),
-                          ValueListenableBuilder<TaskCounter>(
-                            valueListenable: SingletonDataProvider().taskCounterNotifier,
-                            builder: (context, counters, _) {
-                              return _uiMainCards(
-                                context.loc.scheduled,
-                                counters.scheduled,
-                                context.color.scheduledCardBg,
-                                AppIcons.taskScheduled,
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppNumbers.space),
-                      Row(
-                        children: [
-                          ValueListenableBuilder<TaskCounter>(
-                            valueListenable: SingletonDataProvider().taskCounterNotifier,
-                            builder: (context, counters, _) {
-                              return _uiMainCards(
-                                context.loc.all,
-                                counters.all,
-                                context.color.allCardBg,
-                                AppIcons.taskAll,
-                              );
-                            },
-                          ),
-                          const SizedBox(width: AppNumbers.space),
-                          ValueListenableBuilder<TaskCounter>(
-                            valueListenable: SingletonDataProvider().taskCounterNotifier,
-                            builder: (context, counters, _) {
-                              return _uiMainCards(
-                                context.loc.overdue,
-                                counters.overdue,
-                                context.color.overdueCardBg,
-                                AppIcons.taskOverdue,
-                              );
-                            },
-                          ),
-                        ],
+                      ValueListenableBuilder<bool>(
+                        valueListenable: SingletonDataProvider().cardsUpNotifier,
+                        builder: (context, cardsUp, _) {
+                          return AnimatedCrossFade(
+                            duration: const Duration(milliseconds: 300),
+                            crossFadeState: cardsUp ? CrossFadeState.showFirst : CrossFadeState.showSecond,
+                            sizeCurve: Curves.easeInOutCubic,
+                            firstChild: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    ValueListenableBuilder<TaskCounter>(
+                                      valueListenable: SingletonDataProvider().taskCounterNotifier,
+                                      builder: (context, counters, _) {
+                                        return _uiMainCardsUp(
+                                          context.loc.today,
+                                          counters.today,
+                                          context.color.todayCardBg,
+                                          AppIcons.taskToday,
+                                          TaskStatus.today,
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(width: AppNumbers.space),
+                                    ValueListenableBuilder<TaskCounter>(
+                                      valueListenable: SingletonDataProvider().taskCounterNotifier,
+                                      builder: (context, counters, _) {
+                                        return _uiMainCardsUp(
+                                          context.loc.scheduled,
+                                          counters.scheduled,
+                                          context.color.scheduledCardBg,
+                                          AppIcons.taskScheduled,
+                                          TaskStatus.scheduled,
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: AppNumbers.space),
+                                Row(
+                                  children: [
+                                    ValueListenableBuilder<TaskCounter>(
+                                      valueListenable: SingletonDataProvider().taskCounterNotifier,
+                                      builder: (context, counters, _) {
+                                        return _uiMainCardsUp(
+                                          context.loc.all,
+                                          counters.all,
+                                          context.color.allCardBg,
+                                          AppIcons.taskAll,
+                                          TaskStatus.all,
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(width: AppNumbers.space),
+                                    ValueListenableBuilder<TaskCounter>(
+                                      valueListenable: SingletonDataProvider().taskCounterNotifier,
+                                      builder: (context, counters, _) {
+                                        return _uiMainCardsUp(
+                                          context.loc.overdue,
+                                          counters.overdue,
+                                          context.color.overdueCardBg,
+                                          AppIcons.taskOverdue,
+                                          TaskStatus.overdue,
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+
+                            secondChild: const SizedBox(width: double.infinity, height: 0),
+                          );
+                        },
                       ),
                       const SizedBox(height: AppNumbers.space),
                       // Calendar Strip Component
@@ -140,7 +164,7 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         DateTime.now().toIso8601String().split('T')[0] == _searchDate.toIso8601String().split('T')[0]
                             ? context.loc.todays_tasks
-                            : "${_searchDate.toIso8601String().split('T')[0]} ${context.loc.tasks}",
+                            : "${context.loc.tasks}: ${DateFormatProvider().format(_searchDate)}",
                         style: TextStyle(fontSize: AppNumbers.getH3(context), fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: AppNumbers.space),
@@ -157,43 +181,49 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ] else ...[
                                 Expanded(
-                                  child: ListView.builder(
-                                    itemCount: _tasks.length,
-                                    itemBuilder: (context, index) {
-                                      final task = _tasks[index];
-                                      return Column(
-                                        children: [
-                                          TaskCardComponent(
-                                            onTap: () async {
-                                              await context.goTo(
-                                                TaskViewPage(
-                                                  task: task,
-                                                  onDelete: () async {
-                                                    _fetchTasks();
-                                                  },
-                                                  onUpdate: (String dueDate) async {
-                                                    Log.e('___ Due date changed: $dueDate');
-                                                    final parsed = DateTime.parse(dueDate);
-                                                    setState(() {
-                                                      _searchDate = parsed;
-                                                    });
-                                                  },
-                                                  onSubTaskUpdate: (TaskModel task) async {
-                                                    task.updatedAt = DateTime.now().toIso8601String();
-                                                    final success = await _updateTask(task);
-                                                    return success;
-                                                  },
-                                                ),
-                                              );
-                                            },
-                                            task: task,
-                                            categories: _categories,
-                                            searchDate: _searchDate,
-                                            onCompleteTask: _completeTask,
-                                            onUpdateTask: _updateTask,
-                                          ),
-                                          const SizedBox(height: AppNumbers.space),
-                                        ],
+                                  child: ValueListenableBuilder<bool>(
+                                    valueListenable: SingletonDataProvider().cardsUpNotifier,
+                                    builder: (context, cardsUp, _) {
+                                      return ListView.builder(
+                                        padding: EdgeInsets.only(bottom: !cardsUp ? 100 : AppNumbers.padding),
+                                        itemCount: _tasks.length,
+                                        itemBuilder: (context, index) {
+                                          final task = _tasks[index];
+                                          return Column(
+                                            children: [
+                                              TaskCardComponent(
+                                                onTap: () async {
+                                                  await context.goTo(
+                                                    TaskViewPage(
+                                                      task: task,
+                                                      onDelete: () async {
+                                                        _fetchTasks();
+                                                      },
+                                                      onUpdate: (String dueDate) async {
+                                                        Log.e('___ Due date changed: $dueDate');
+                                                        final parsed = DateTime.parse(dueDate);
+                                                        setState(() {
+                                                          _searchDate = parsed;
+                                                        });
+                                                      },
+                                                      onSubTaskUpdate: (TaskModel task) async {
+                                                        task.updatedAt = DateTime.now().toIso8601String();
+                                                        final success = await _updateTask(task);
+                                                        return success;
+                                                      },
+                                                    ),
+                                                  );
+                                                },
+                                                task: task,
+                                                categories: _categories,
+                                                searchDate: _searchDate,
+                                                onCompleteTask: _completeTask,
+                                                onUpdateTask: _updateTask,
+                                              ),
+                                              const SizedBox(height: AppNumbers.space),
+                                            ],
+                                          );
+                                        },
                                       );
                                     },
                                   ),
@@ -214,23 +244,138 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   Positioned(
-                    bottom: 0,
-                    right: AppNumbers.padding,
-                    child: FabComponent(
-                      onPressed: () async {
-                        await context.goTo(
-                          CreateUpdatePage(
-                            onChange: (String dueDate) async {
-                              DateTime parsedDate = DateTime.parse(dueDate);
-                              setState(() {
-                                _searchDate = parsedDate;
-                              });
-                              await _fetchTasks();
-                            },
+                    bottom: AppNumbers.padding,
+                    right: 0,
+                    child: ValueListenableBuilder<bool>(
+                      valueListenable: SingletonDataProvider().cardsUpNotifier,
+                      builder: (context, cardsUp, _) {
+                        return AnimatedScale(
+                          scale: cardsUp ? 1.0 : 0.0,
+                          duration: const Duration(milliseconds: 250),
+                          curve: Curves.easeInOutBack,
+                          child: AnimatedOpacity(
+                            opacity: cardsUp ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 200),
+                            child: IgnorePointer(
+                              ignoring: !cardsUp,
+                              child: FabComponent(
+                                onPressed: () async {
+                                  await context.goTo(
+                                    CreateUpdatePage(
+                                      onChange: (String dueDate) async {
+                                        final parsedDate = DateTime.parse(dueDate);
+                                        setState(() {
+                                          _searchDate = parsedDate;
+                                        });
+                                        await _fetchTasks();
+                                      },
+                                    ),
+                                  );
+                                },
+                                icon: AppIcons.add,
+                              ),
+                            ),
                           ),
                         );
                       },
-                      icon: AppIcons.add,
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                    child: ValueListenableBuilder<bool>(
+                      valueListenable: SingletonDataProvider().cardsUpNotifier,
+                      builder: (context, cardsUp, _) {
+                        return AnimatedSlide(
+                          offset: !cardsUp ? Offset.zero : const Offset(0, 1.2),
+                          duration: const Duration(milliseconds: 280),
+                          curve: Curves.easeOutCubic,
+                          child: AnimatedOpacity(
+                            opacity: !cardsUp ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 200),
+                            child: IgnorePointer(
+                              ignoring: cardsUp,
+                              child: CardComponent(
+                                padding: AppNumbers.space,
+                                color: context.color.overBg.withAlpha(150),
+                                child: Row(
+                                  children: [
+                                    ValueListenableBuilder<TaskCounter>(
+                                      valueListenable: SingletonDataProvider().taskCounterNotifier,
+                                      builder: (context, counters, _) {
+                                        return _uiMainCardsDown(
+                                          context.loc.today,
+                                          counters.today,
+                                          context.color.todayCardBg,
+                                          AppIcons.taskToday,
+                                          TaskStatus.today,
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(width: AppNumbers.space),
+                                    ValueListenableBuilder<TaskCounter>(
+                                      valueListenable: SingletonDataProvider().taskCounterNotifier,
+                                      builder: (context, counters, _) {
+                                        return _uiMainCardsDown(
+                                          context.loc.scheduled,
+                                          counters.scheduled,
+                                          context.color.scheduledCardBg,
+                                          AppIcons.taskScheduled,
+                                          TaskStatus.scheduled,
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(width: AppNumbers.space),
+                                    ValueListenableBuilder<TaskCounter>(
+                                      valueListenable: SingletonDataProvider().taskCounterNotifier,
+                                      builder: (context, counters, _) {
+                                        return _uiMainCardsDown(
+                                          context.loc.all,
+                                          counters.all,
+                                          context.color.allCardBg,
+                                          AppIcons.taskAll,
+                                          TaskStatus.all,
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(width: AppNumbers.space),
+                                    ValueListenableBuilder<TaskCounter>(
+                                      valueListenable: SingletonDataProvider().taskCounterNotifier,
+                                      builder: (context, counters, _) {
+                                        return _uiMainCardsDown(
+                                          context.loc.overdue,
+                                          counters.overdue,
+                                          context.color.overdueCardBg,
+                                          AppIcons.taskOverdue,
+                                          TaskStatus.overdue,
+                                        );
+                                      },
+                                    ),
+                                    const SizedBox(width: AppNumbers.space),
+                                    FabComponent(
+                                      onPressed: () async {
+                                        await context.goTo(
+                                          CreateUpdatePage(
+                                            onChange: (String dueDate) async {
+                                              final parsedDate = DateTime.parse(dueDate);
+                                              setState(() {
+                                                _searchDate = parsedDate;
+                                              });
+                                              await _fetchTasks();
+                                            },
+                                          ),
+                                        );
+                                      },
+                                      icon: AppIcons.add,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -241,9 +386,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   //UI
-  Widget _uiMainCards(String title, int count, Color cardColor, IconData icon) {
+  Widget _uiMainCardsUp(String title, int count, Color cardColor, IconData icon, TaskStatus status) {
     return Expanded(
       child: CardComponent(
+        onTap: () async {
+          await context.goTo(TaskByStatusPage(reason: status));
+        },
         radius: AppNumbers.radiusSm,
         color: cardColor,
         child: Padding(
@@ -275,6 +423,57 @@ class _HomePageState extends State<HomePage> {
                     style: TextStyle(color: context.color.primaryText, fontSize: AppNumbers.getH3(context)),
                   ),
                 ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _uiMainCardsDown(String title, int count, Color cardColor, IconData icon, TaskStatus status) {
+    return Expanded(
+      child: InkWell(
+        onTap: () async {
+          await context.goTo(TaskByStatusPage(reason: status));
+        },
+        borderRadius: BorderRadius.circular(AppNumbers.radius),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: AppNumbers.paddingSmall),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Icon(icon, color: context.color.primaryText, size: AppNumbers.iconMd(context)),
+                  Positioned(
+                    top: -5,
+                    right: -9,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1.5),
+                      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                      decoration: BoxDecoration(color: cardColor, shape: BoxShape.circle),
+                      alignment: Alignment.center,
+                      child: Text(
+                        '$count',
+                        style: TextStyle(color: context.color.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                title,
+                style: TextStyle(
+                  color: context.color.secondaryText,
+                  fontSize: AppNumbers.caption(context),
+                  fontWeight: FontWeight.w500,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
             ],
           ),

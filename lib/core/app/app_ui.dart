@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:porfolio_task_calendar_app/core/app/app_constants.dart';
+import 'package:porfolio_task_calendar_app/core/app/app_icons.dart';
 import 'package:porfolio_task_calendar_app/core/app/app_numbers.dart';
 import 'package:porfolio_task_calendar_app/core/models/category_model.dart';
 import 'package:porfolio_task_calendar_app/core/models/tasks_model.dart';
 import 'package:porfolio_task_calendar_app/core/ui/components/card_component.dart';
+import 'package:porfolio_task_calendar_app/core/ui/pages/settings/settings_page.dart';
 import 'package:porfolio_task_calendar_app/core/utils/app_utils.dart';
 import 'package:porfolio_task_calendar_app/core/utils/extension/context_extension.dart';
 import 'package:porfolio_task_calendar_app/core/utils/providers/locale_provider.dart';
+import 'package:porfolio_task_calendar_app/core/utils/providers/shared_prefs_provider.dart';
+import 'package:porfolio_task_calendar_app/core/utils/providers/singleton_data_provider.dart';
 import 'package:porfolio_task_calendar_app/core/utils/providers/theme_provider.dart';
 
 class AppUI {
-  static Row leftSideWidgetHome(BuildContext context, ThemeProvider themeProvider, LocaleProvider localeProvider) {
+  static Row leftSideWidgetHome(BuildContext context, VoidCallback onSettingsClosed) {
     return Row(
       children: [
         Row(
@@ -22,41 +26,76 @@ class AppUI {
               clipBehavior: Clip.antiAlias,
               child: InkWell(
                 customBorder: const CircleBorder(),
-                onTap: () {
-                  if (themeProvider.themeMode == ThemeMode.dark) {
-                    themeProvider.toggleTheme(AppThemeEnum.light);
-                  } else {
-                    themeProvider.toggleTheme(AppThemeEnum.dark);
-                  }
+                onTap: () async {
+                  SingletonDataProvider().cardsUp = !SingletonDataProvider().cardsUp;
+                  await SharedPrefsProvider.setValue(AppConstants.cardUp, SingletonDataProvider().cardsUp);
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(AppNumbers.paddingSmall),
-                  child: Icon(themeProvider.themeMode == ThemeMode.dark ? Symbols.dark_mode : Symbols.light_mode),
+                  child: Icon(AppIcons.cardUpDown),
                 ),
               ),
             ),
             const SizedBox(width: AppNumbers.spaceSmall),
-            //Lang
             Material(
               color: context.color.cardBorder,
               shape: const CircleBorder(),
               clipBehavior: Clip.antiAlias,
               child: InkWell(
                 customBorder: const CircleBorder(),
-                onTap: () {
-                  if (localeProvider.locale.languageCode == 'en') {
-                    localeProvider.setLocale(const Locale('el'));
-                  } else {
-                    localeProvider.setLocale(const Locale('en'));
-                  }
+                onTap: () async {
+                  await context.goTo(SettingsPage());
+                  onSettingsClosed();
                 },
-                child: Padding(padding: const EdgeInsets.all(AppNumbers.paddingSmall), child: Icon(Symbols.language)),
+                child: Padding(padding: const EdgeInsets.all(AppNumbers.paddingSmall), child: Icon(AppIcons.settings)),
               ),
             ),
           ],
         ),
       ],
     );
+  }
+
+  static Row authProviders(BuildContext context, ThemeProvider themeProvider, LocaleProvider localeProvider) {
+    return Row(children: [
+     Material(
+          color: context.color.cardBorder,
+          shape: const CircleBorder(),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () {
+              if (themeProvider.themeMode == ThemeMode.dark) {
+                themeProvider.toggleTheme(AppThemeEnum.light);
+              } else {
+                themeProvider.toggleTheme(AppThemeEnum.dark);
+              }
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(AppNumbers.paddingSmall),
+              child: Icon(themeProvider.themeMode == ThemeMode.dark ? Symbols.dark_mode : Symbols.light_mode),
+            ),
+          ),
+        ),
+        const SizedBox(width: AppNumbers.spaceSmall),
+        //Lang
+        Material(
+          color: context.color.cardBorder,
+          shape: const CircleBorder(),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: () {
+              if (localeProvider.locale.languageCode == 'en') {
+                localeProvider.setLocale(const Locale('el'));
+              } else {
+                localeProvider.setLocale(const Locale('en'));
+              }
+            },
+            child: Padding(padding: const EdgeInsets.all(AppNumbers.paddingSmall), child: Icon(Symbols.language)),
+          ),
+        ),
+    ]);
   }
 
   static Widget deleteButton(BuildContext context, VoidCallback onTap) {
@@ -67,7 +106,10 @@ class AppUI {
       child: InkWell(
         customBorder: const CircleBorder(),
         onTap: onTap,
-        child: Padding(padding: const EdgeInsets.all(AppNumbers.paddingSmall), child: Icon(Symbols.delete)),
+        child: Padding(
+          padding: const EdgeInsets.all(AppNumbers.paddingSmall),
+          child: Icon(AppIcons.delete, color: context.color.error),
+        ),
       ),
     );
   }
@@ -138,3 +180,41 @@ class AppUI {
     );
   }
 }
+
+// Material(
+//               color: context.color.cardBorder,
+//               shape: const CircleBorder(),
+//               clipBehavior: Clip.antiAlias,
+//               child: InkWell(
+//                 customBorder: const CircleBorder(),
+//                 onTap: () {
+//                   if (themeProvider.themeMode == ThemeMode.dark) {
+//                     themeProvider.toggleTheme(AppThemeEnum.light);
+//                   } else {
+//                     themeProvider.toggleTheme(AppThemeEnum.dark);
+//                   }
+//                 },
+//                 child: Padding(
+//                   padding: const EdgeInsets.all(AppNumbers.paddingSmall),
+//                   child: Icon(themeProvider.themeMode == ThemeMode.dark ? Symbols.dark_mode : Symbols.light_mode),
+//                 ),
+//               ),
+//             ),
+//             const SizedBox(width: AppNumbers.spaceSmall),
+//             //Lang
+//             Material(
+//               color: context.color.cardBorder,
+//               shape: const CircleBorder(),
+//               clipBehavior: Clip.antiAlias,
+//               child: InkWell(
+//                 customBorder: const CircleBorder(),
+//                 onTap: () {
+//                   if (localeProvider.locale.languageCode == 'en') {
+//                     localeProvider.setLocale(const Locale('el'));
+//                   } else {
+//                     localeProvider.setLocale(const Locale('en'));
+//                   }
+//                 },
+//                 child: Padding(padding: const EdgeInsets.all(AppNumbers.paddingSmall), child: Icon(Symbols.language)),
+//               ),
+//             ),

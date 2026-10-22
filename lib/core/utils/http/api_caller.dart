@@ -27,7 +27,23 @@ class ApiCaller {
 
       if (filters != null) {
         for (final entry in filters.entries) {
-          query = query.eq(entry.key, entry.value);
+          final value = entry.value;
+
+          if (value is Map<String, dynamic>) {
+            if (value.containsKey(r'$lt')) {
+              query = query.lt(entry.key, value[r'$lt']);
+            } else if (value.containsKey(r'$gt')) {
+              query = query.gt(entry.key, value[r'$gt']);
+            } else if (value.containsKey(r'$lte')) {
+              query = query.lte(entry.key, value[r'$lte']);
+            } else if (value.containsKey(r'$gte')) {
+              query = query.gte(entry.key, value[r'$gte']);
+            } else {
+              query = query.eq(entry.key, value);
+            }
+          } else {
+            query = query.eq(entry.key, value);
+          }
         }
       }
 

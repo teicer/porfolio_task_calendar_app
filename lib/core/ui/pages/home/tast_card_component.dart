@@ -7,6 +7,7 @@ import 'package:porfolio_task_calendar_app/core/models/tasks_model.dart';
 import 'package:porfolio_task_calendar_app/core/ui/components/card_component.dart';
 import 'package:porfolio_task_calendar_app/core/ui/components/sub_task_item_component.dart';
 import 'package:porfolio_task_calendar_app/core/utils/extension/context_extension.dart';
+import 'package:porfolio_task_calendar_app/core/utils/providers/date_time_provider.dart';
 
 class TaskCardComponent extends StatefulWidget {
   final TaskModel task;
@@ -73,7 +74,7 @@ class _TaskCardComponentState extends State<TaskCardComponent> {
                           widget.searchDate.toIso8601String().split('T').first ==
                                   DateTime.now().toIso8601String().split('T').first
                               ? context.loc.today
-                              : task.dueDate,
+                              : DateFormatProvider().format(widget.searchDate),
                           style: TextStyle(color: context.color.secondaryText, fontSize: AppNumbers.caption(context)),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

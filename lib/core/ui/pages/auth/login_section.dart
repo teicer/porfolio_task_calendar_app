@@ -6,6 +6,7 @@ import 'package:porfolio_task_calendar_app/core/ui/components/button_component.d
 import 'package:porfolio_task_calendar_app/core/ui/components/input_component.dart';
 import 'package:porfolio_task_calendar_app/core/ui/components/progress_dialog.dart';
 import 'package:porfolio_task_calendar_app/core/ui/pages/debug/debug_page.dart';
+import 'package:porfolio_task_calendar_app/core/ui/pages/init_page.dart';
 import 'package:porfolio_task_calendar_app/core/utils/app_utils.dart';
 import 'package:porfolio_task_calendar_app/core/utils/extension/context_extension.dart';
 import 'package:porfolio_task_calendar_app/core/utils/providers/auth_provider.dart';
@@ -78,7 +79,7 @@ class _LoginSectionState extends State<LoginSection> {
             if (res.isSuccessful()) {
               if (context.mounted) {
                 context.snackbar(AppUtils.getTranslation(res.code), type: PopupType.success);
-                await context.goTo(DebugPage());
+                await context.goTo(InitPage());
               }
             } else {
               if (context.mounted) {

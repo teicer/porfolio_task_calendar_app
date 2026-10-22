@@ -11,8 +11,6 @@ import 'package:porfolio_task_calendar_app/core/utils/providers/locale_provider.
 
 class AuthPage extends StatefulWidget {
   const AuthPage({super.key});
-  // final ThemeProvider themeProvider;
-  // final LocaleProvider localeProvider;
 
   @override
   State<AuthPage> createState() => _AuthPageState();
@@ -20,6 +18,8 @@ class AuthPage extends StatefulWidget {
 
 class _AuthPageState extends State<AuthPage> {
   bool _loginSection = true;
+  final ThemeProvider themeProvider = ThemeProvider();
+  final LocaleProvider localeProvider = LocaleProvider();
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -32,7 +32,7 @@ class _AuthPageState extends State<AuthPage> {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [AppUI.leftSideWidgetHome(context, ThemeProvider(), LocaleProvider())],
+              children: [AppUI.authProviders(context, themeProvider, localeProvider)],
             ),
             const SizedBox(height: AppNumbers.space),
             CardComponent(
@@ -48,7 +48,7 @@ class _AuthPageState extends State<AuthPage> {
                       });
                     },
                     child: Text(
-                      _loginSection ? context.loc.already_have_account : context.loc.dont_have_account,
+                      _loginSection ? context.loc.dont_have_account : context.loc.already_have_account,
                       style: TextStyle(fontSize: AppNumbers.caption(context), color: context.color.secondaryText),
                     ),
                   ),

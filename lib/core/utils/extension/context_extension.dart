@@ -42,6 +42,144 @@ extension ContextExtension on BuildContext {
     );
   }
 
+  Future<bool> dialogYesNo(String title, String subTitle, IconData icon) async {
+    final res = await showDialog<bool>(
+      context: this,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ctx.color.bg,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppNumbers.radius)),
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon),
+            const SizedBox(width: AppNumbers.space),
+            Text(
+              title,
+              style: TextStyle(
+                color: ctx.color.secondaryText,
+                fontWeight: FontWeight.bold,
+                fontSize: AppNumbers.getH3(ctx),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: AppNumbers.padding),
+              child: Text(
+                subTitle,
+                style: TextStyle(color: ctx.color.primaryText, fontSize: AppNumbers.body(ctx)),
+              ),
+            ),
+            const SizedBox(height: AppNumbers.space),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  child: Text(
+                    ctx.loc.no,
+                    style: TextStyle(fontSize: AppNumbers.body(ctx), color: ctx.color.disabledText),
+                  ),
+                  onPressed: () {
+                    Navigator.of(ctx).pop(false);
+                  },
+                ),
+
+                TextButton(
+                  child: Text(
+                    ctx.loc.yes,
+                    style: TextStyle(fontSize: AppNumbers.body(ctx), color: ctx.color.primaryAccent),
+                  ),
+                  onPressed: () {
+                    Navigator.of(ctx).pop(true);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    return res ?? false;
+  }
+
+  Future<bool> dialogCustom(
+    String title,
+    Widget child,
+    String positiveText,
+    String negativeText, {
+    IconData? icon,
+    String subTitle = '',
+  }) async {
+    final res = await showDialog<bool>(
+      context: this,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: ctx.color.bg,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppNumbers.radius)),
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null) ...[Icon(icon), const SizedBox(width: AppNumbers.space)],
+            Text(
+              title,
+              style: TextStyle(
+                color: ctx.color.secondaryText,
+                fontWeight: FontWeight.bold,
+                fontSize: AppNumbers.getH3(ctx),
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (subTitle.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppNumbers.padding),
+                child: Text(
+                  subTitle,
+                  style: TextStyle(color: ctx.color.primaryText, fontSize: AppNumbers.body(ctx)),
+                ),
+              ),
+              const SizedBox(height: AppNumbers.space),
+            ],
+            SizedBox(child: child),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  child: Text(
+                    negativeText,
+                    style: TextStyle(fontSize: AppNumbers.body(ctx), color: ctx.color.disabledText),
+                  ),
+                  onPressed: () {
+                    Navigator.of(ctx).pop(false);
+                  },
+                ),
+                TextButton(
+                  child: Text(
+                    positiveText,
+                    style: TextStyle(fontSize: AppNumbers.body(ctx), color: ctx.color.primaryAccent),
+                  ),
+                  onPressed: () {
+                    Navigator.of(ctx).pop(true);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+    return res ?? false;
+  }
+
   /// Safely pops the current route, even from inside dialogs or bottom sheets.
   Future<bool> pop({bool? result, bool tryRootIfNotPopped = true}) async {
     // Ensure the context is valid

@@ -13,6 +13,7 @@ import 'package:porfolio_task_calendar_app/core/utils/app_utils.dart';
 import 'package:porfolio_task_calendar_app/core/utils/extension/context_extension.dart';
 import 'package:porfolio_task_calendar_app/core/utils/http/api_caller.dart';
 import 'package:porfolio_task_calendar_app/core/utils/log/log.dart';
+import 'package:porfolio_task_calendar_app/core/utils/providers/date_time_provider.dart';
 import 'package:porfolio_task_calendar_app/core/utils/providers/singleton_data_provider.dart';
 import 'package:porfolio_task_calendar_app/core/utils/services/supabase_service.dart';
 import 'package:table_calendar/table_calendar.dart';
@@ -45,7 +46,8 @@ class _CreateUpdatePageState extends State<CreateUpdatePage> {
         setState(() {
           _cTitle.text = widget.task!.title;
           _cNotes.text = widget.task!.notes;
-          _cDueDate.text = widget.task!.dueDate;
+          // _cDueDate.text = widget.task!.dueDate;
+          _cDueDate.text = DateFormatProvider().format(DateTime.parse(widget.task!.dueDate));
           _cDueDateTime.text = widget.task!.dueTime;
           _category = _categories.firstWhere((c) => c.id == widget.task!.categoryId, orElse: () => CategoryModel());
           _subTasks.addAll(widget.task!.subTasks);
@@ -53,7 +55,8 @@ class _CreateUpdatePageState extends State<CreateUpdatePage> {
         });
       } else {
         setState(() {
-          _cDueDate.text = DateTime.now().toIso8601String().split('T').first;
+          // _cDueDate.text = DateTime.now().toIso8601String().split('T').first;
+          _cDueDate.text = DateFormatProvider().format(DateTime.now());
           _cDueDateTime.text = DateTime.now().toIso8601String().split('T').last.substring(0, 5);
           _category = _categories.isNotEmpty ? _categories.first : CategoryModel();
         });
@@ -245,7 +248,8 @@ class _CreateUpdatePageState extends State<CreateUpdatePage> {
 
     if (pickedDate != null) {
       setState(() {
-        _cDueDate.text = pickedDate.toIso8601String().split('T').first;
+        // _cDueDate.text = pickedDate.toIso8601String().split('T').first;
+        _cDueDate.text = DateFormatProvider().format(pickedDate);
       });
     }
   }
@@ -290,7 +294,8 @@ class _CreateUpdatePageState extends State<CreateUpdatePage> {
       ..updatedAt = DateTime.now().toIso8601String()
       ..subTasks = _subTasks
       ..subTasksCompleted = _subTasksComplete
-      ..dueDate = _cDueDate.text
+      // ..dueDate = _cDueDate.text
+      ..dueDate = DateFormatProvider().toApi(_cDueDate.text)
       ..dueTime = _cDueDateTime.text;
 
     if (task.userId.isEmpty) {
@@ -308,7 +313,7 @@ class _CreateUpdatePageState extends State<CreateUpdatePage> {
       if (mounted) {
         context.snackbar(AppUtils.getTranslation(res.code), type: PopupType.success);
         if (widget.onChange != null) {
-          widget.onChange!(_cDueDate.text);
+          widget.onChange!(DateFormatProvider().toApi(_cDueDate.text));
         }
         await context.pop();
       }
@@ -330,7 +335,7 @@ class _CreateUpdatePageState extends State<CreateUpdatePage> {
       ..updatedAt = DateTime.now().toIso8601String()
       ..subTasks = _subTasks
       ..subTasksCompleted = _subTasksComplete
-      ..dueDate = _cDueDate.text
+      ..dueDate = DateFormatProvider().toApi(_cDueDate.text)
       ..dueTime = _cDueDateTime.text;
 
     final res = await ApiCaller.update(AppConstants.tasks, task.toJson(), filters: {'id': task.id});
@@ -345,7 +350,7 @@ class _CreateUpdatePageState extends State<CreateUpdatePage> {
           widget.onUpdate!(task);
         }
         if (widget.onChange != null) {
-          widget.onChange!(_cDueDate.text);
+          widget.onChange!(DateFormatProvider().toApi(_cDueDate.text));
         }
         if (mounted) {
           context.snackbar(AppUtils.getTranslation(res.code), type: PopupType.success);

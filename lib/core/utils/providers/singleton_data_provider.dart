@@ -21,4 +21,7 @@ class SingletonDataProvider {
 
   List<TaskDayModel> get taskDays => taskDaysNotifier.value;
   TaskCounter get taskCounter => taskCounterNotifier.value;
+  final ValueNotifier<bool> cardsUpNotifier = ValueNotifier<bool>(true);
+  bool get cardsUp => cardsUpNotifier.value;
+  set cardsUp(bool val) => cardsUpNotifier.value = val;
 }

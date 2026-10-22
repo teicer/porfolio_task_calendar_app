@@ -16,4 +16,6 @@ class AppIcons {
   static const IconData add = Icons.add;
   static const IconData delete = Symbols.delete;
   static const IconData edit = Icons.edit;
+  static const IconData cardUpDown = Symbols.unfold_more;
+  static const IconData settings = Symbols.settings;
 }

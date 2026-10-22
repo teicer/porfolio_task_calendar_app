@@ -155,7 +155,7 @@ class _PageBaseState extends State<PageBase> with RouteAware {
               _buildTopBar(),
               const SizedBox(height: AppNumbers.padding),
               Expanded(child: widget.child),
-              const SizedBox(height: AppNumbers.padding),
+              const SizedBox(height: AppNumbers.paddingSmall),
             ],
           ),
         ),

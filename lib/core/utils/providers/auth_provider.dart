@@ -46,6 +46,8 @@ class AuthProvider {
   }
 
   Future<APIResponse> signOutResponse() async {
+
+    
     try {
       await _supabase.auth.signOut();
       Log.e('SIGN OUT SUCCESS');

@@ -9,6 +9,7 @@ import 'package:porfolio_task_calendar_app/core/ui/components/card_component.dar
 import 'package:porfolio_task_calendar_app/core/ui/components/fab_component.dart';
 import 'package:porfolio_task_calendar_app/core/ui/components/input_component.dart';
 import 'package:porfolio_task_calendar_app/core/ui/components/page_base.dart';
+import 'package:porfolio_task_calendar_app/core/ui/components/progress_dialog.dart';
 import 'package:porfolio_task_calendar_app/core/ui/components/sub_task_item_component.dart';
 import 'package:porfolio_task_calendar_app/core/ui/pages/tasks/create_update_page.dart';
 import 'package:porfolio_task_calendar_app/core/utils/app_utils.dart';
@@ -43,10 +44,20 @@ class _TaskViewPageState extends State<TaskViewPage> {
     return PageBase.normal(
       title: context.loc.task_details,
       leftSideWidget: AppUI.deleteButton(context, () async {
-        if (await _deleteTask()) {
-          await widget.onDelete();
-          if (context.mounted) {
-            await context.pop();
+        final bool a = await context.dialogYesNo(
+          context.loc.delete,
+          '${context.loc.are_you_sure} ${context.loc.this_action_irreversible}',
+          AppIcons.delete,
+        );
+
+        if (a) {
+          ProgressDialog.show();
+          if (await _deleteTask()) {
+            ProgressDialog.dismiss();
+            await widget.onDelete();
+            if (context.mounted) {
+              await context.pop();
+            }
           }
         }
       }),

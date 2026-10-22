@@ -153,6 +153,15 @@ class AppLocalizationsEl extends AppLocalizations {
   String get todays_tasks => 'Οι σημερινές εργασίες';
 
   @override
+  String get scheduled_tasks => 'Προγραμματισμένες εργασίες';
+
+  @override
+  String get overdue_tasks => 'Καθυστερημένες εργασίες';
+
+  @override
+  String get all_tasks => 'Όλες οι εργασίες';
+
+  @override
   String get tasks => 'Εργασίες';
 
   @override
@@ -226,4 +235,56 @@ class AppLocalizationsEl extends AppLocalizations {
 
   @override
   String get save_task => 'Αποθήκευση εργασίας';
+
+  @override
+  String get this_action_irreversible => 'Αυτή η ενέργεια είναι μη αναστρέψιμη';
+
+  @override
+  String get are_you_sure => 'Είστε σίγουροι;';
+
+  @override
+  String get caution => 'Προσοχή';
+
+  @override
+  String get info => 'Πληροφορίες';
+
+  @override
+  String get yes => 'Ναι';
+
+  @override
+  String get no => 'Όχι';
+
+  @override
+  String get complete_tasks => 'Ολοκληρωμένες εργασίες';
+
+  @override
+  String get uncomplete_tasks => 'Μη ολοκληρωμένες εργασίες';
+
+  @override
+  String get settings => 'Ρυθμίσεις';
+
+  @override
+  String get language_selection => 'Επιλογή γλώσσας';
+
+  @override
+  String get theme_selection => 'Επιλογή θέματος';
+
+  @override
+  String get date_format_selection => 'Επιλογή μορφής ημερομηνίας';
+
+  @override
+  String get delete => 'Διαγραφή';
+
+  @override
+  String get logout => 'Αποσύνδεση';
+
+  @override
+  String get logout_successful => 'Η αποσύνδεση ήταν επιτυχής.';
+
+  @override
+  String get are_you_sure_to_logout =>
+      'Είστε σίγουροι ότι θέλετε να αποσυνδεθείτε;';
+
+  @override
+  String get friend => 'Φίλε/η';
 }

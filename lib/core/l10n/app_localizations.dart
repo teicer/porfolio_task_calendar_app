@@ -368,6 +368,24 @@ abstract class AppLocalizations {
   /// **'Today\'s tasks'**
   String get todays_tasks;
 
+  /// No description provided for @scheduled_tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled tasks'**
+  String get scheduled_tasks;
+
+  /// No description provided for @overdue_tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Overdue tasks'**
+  String get overdue_tasks;
+
+  /// No description provided for @all_tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'All tasks'**
+  String get all_tasks;
+
   /// No description provided for @tasks.
   ///
   /// In en, this message translates to:
@@ -517,6 +535,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Save Task'**
   String get save_task;
+
+  /// No description provided for @this_action_irreversible.
+  ///
+  /// In en, this message translates to:
+  /// **'This action is irreversible'**
+  String get this_action_irreversible;
+
+  /// No description provided for @are_you_sure.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure?'**
+  String get are_you_sure;
+
+  /// No description provided for @caution.
+  ///
+  /// In en, this message translates to:
+  /// **'Caution'**
+  String get caution;
+
+  /// No description provided for @info.
+  ///
+  /// In en, this message translates to:
+  /// **'Information'**
+  String get info;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @complete_tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed tasks'**
+  String get complete_tasks;
+
+  /// No description provided for @uncomplete_tasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Uncompleted tasks'**
+  String get uncomplete_tasks;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @language_selection.
+  ///
+  /// In en, this message translates to:
+  /// **'Language Selection'**
+  String get language_selection;
+
+  /// No description provided for @theme_selection.
+  ///
+  /// In en, this message translates to:
+  /// **'Theme Selection'**
+  String get theme_selection;
+
+  /// No description provided for @date_format_selection.
+  ///
+  /// In en, this message translates to:
+  /// **'Date Format Selection'**
+  String get date_format_selection;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
+  /// No description provided for @logout_successful.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout successful.'**
+  String get logout_successful;
+
+  /// No description provided for @are_you_sure_to_logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to logout?'**
+  String get are_you_sure_to_logout;
+
+  /// No description provided for @friend.
+  ///
+  /// In en, this message translates to:
+  /// **'Friend'**
+  String get friend;
 }
 
 class _AppLocalizationsDelegate
